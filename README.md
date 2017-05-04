@@ -6,12 +6,16 @@ DISCLAIMER: This plugin is in beta stage, and is not production ready!
 
 ## Why
 
-Create and use [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers) can be cumbersome sometimes. This plugin aims to facilitate the use of Web Workers within Vue components.
+Create and use [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers) can be cumbersome sometimes. This plugin aims to facilitate the use of Web Workers within Vue components. It is a wrapper for [simple-web-worker](https://github.com/israelss/simple-web-worker).
 
 ## How to install and use
 
-```
+```javascript
 yarn add vue-worker
+
+// or
+
+npm install vue-worker --save
 ```
 
 Then add in main.js:
