@@ -16,7 +16,7 @@ yarn add vue-worker
 
 Then add in main.js:
 
-```
+```javascript
 import Vue from 'vue'
 import VueWorker from 'vue-worker'
 Vue.use(VueWorker)
@@ -26,7 +26,7 @@ That will inject a property into Vue (and pass it to every child component), wit
 
 You can change that name when registering the plugin:
 
-```
+```javascript
 import VueWorker from 'vue-worker'
 Vue.use(VueWorker, '$desired-name')
 ```
@@ -39,7 +39,7 @@ There are two methods in `$worker`. Both are intended to be used like promises.
 
 The most basic and straightforward is `run`, and you use it like this:
 
-```
+```javascript
 this.$worker.run(func)
 ```
 
@@ -47,7 +47,7 @@ Where `func` is the function to be runned in worker.
 
 E.g.:
 
-```
+```javascript
 // run() works like Promise.resolve(), but in another thread
 this.$worker.run(() => 'Function in other thread')
   .then(console.log) // logs 'Function in other thread'
@@ -63,7 +63,7 @@ It creates a reusable worker (not really, more on this ahead) with determined ac
 
 You use it like this:
 
-```
+```javascript
 let worker = this.$worker.create(actionsArray)
 ```
 
@@ -73,7 +73,7 @@ The first field is the message which will be given to `postMessage()` or `postAl
 
 E.g.:
 
-```
+```javascript
 const actions = [
   { message: 'func1', func: () => 'Working on func1'},
   { message: 'func2', func: () => 'Working on func2'},
@@ -107,7 +107,7 @@ Instead, you get an object which holds the given messages-actions map, and when 
 
 So, to "terminate" a "worker" when it is not needed anymore, you can just do:
 
-```
+```javascript
 let worker = this.$worker.create(actions)
 
 // use the worker
