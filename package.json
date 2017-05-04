@@ -1,0 +1,25 @@
+{
+  "name": "vue-worker",
+  "version": "0.1.0",
+  "description": "A Vue.js plugin to use webworkers in a simply way.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/israelss/vue-worker.git"
+  },
+  "keywords": [
+    "VueJs",
+    "Web",
+    "Worker",
+    "Plugin"
+  ],
+  "author": "Israel Sant'Anna <israel.santanna@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/israelss/vue-worker/issues"
+  },
+  "homepage": "https://github.com/israelss/vue-worker#readme"
+}
