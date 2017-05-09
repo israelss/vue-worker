@@ -23,6 +23,6 @@
   },
   "homepage": "https://github.com/israelss/vue-worker#readme",
   "dependencies": {
-    "simple-web-worker": "^0.1.0"
+    "simple-web-worker": "^1.0.1"
   }
 }
