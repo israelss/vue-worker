@@ -1,5 +1,10 @@
 # Changelog
 
+## **1.1.0**
+
+* API update (as per [simple-web-worker](https://github.com/israelss/simple-web-worker)).
+* Fixed [simple-web-worker](https://github.com/israelss/simple-web-worker)'s version (@1.1.0).
+
 ## **1.0.0**
 
 * First stable release.

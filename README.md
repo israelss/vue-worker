@@ -4,10 +4,10 @@
 
 ## Changelog
 
-### **1.0.0**
+### **1.1.0**
 
 #### _Highlights:_
-* First stable release.
+* API update (as per [simple-web-worker](https://github.com/israelss/simple-web-worker)).
 
 See full changelog [here](https://github.com/israelss/vue-worker/blob/master/changelog.md).
 
@@ -45,109 +45,151 @@ Vue.use(VueWorker, '$desired-name')
 
 ## API
 
-As this module is just a wrapper for [simple-web-worker](https://github.com/israelss/simple-web-worker), the API is exact the same as [simple-web-worker's API](https://github.com/israelss/simple-web-worker/blob/master/README.md#api).
+### ***NOTICE:***
 
-### this.$worker.run(_func_)
+#### It is not possible to pass as an arg `this` from a Vue Component. You can pass `this.$data` or any variable within `data` or `computed`, though.
+
+### this.$worker.run(_func, [args]?_)
 
 > Where:
-<br>* _func_ is the function to be runned in worker
+>* _func_ is the function to be runned in worker
+>* _[args]_ is an optional array of arguments that will be used by _func_
+
+>This method creates a disposable web worker, runs and returns the result of given function and closes the worker.
+<br>This method works like Promise.resolve(), but in another thread.
 
 E.g.:
 ```javascript
-// run() works like Promise.resolve(), but in another thread
-this.$worker.run(() => 'Function in other thread')
-  .then(console.log) // logs 'Function in other thread'
+this.$worker.run(() => 'this.$worker run 1: Function in other thread')
+  .then(console.log) // logs 'this.$worker run 1: Function in other thread'
   .catch(console.error) // logs any possible error
+
+this.$worker.run((arg1, arg2) => `this.$worker run 2: ${arg1} ${arg2}`, ['Another', 'function in other thread'])
+    .then(console.log) // logs 'this.$worker run 2: Another function in other thread'
+    .catch(console.error) // logs any possible error
 ```
-This method creates a disposable web worker, runs and returns the result of given function and closes the worker.
 
 ### this.$worker.create(_[actions]?_)
 
 > Where:
-<br>* `[actions]` is an optional array of objects with two fields, `message` and `func`. Essentially, it is a messages-actions map.
-<br><br>If _[actions]_ is omitted or `undefined`, the created <worker\> will have no registered actions, so you'll have to use the method `register` before you can use the worker.
+>* _[actions]_ is an optional array of objects with two fields, `message` and `func`. Essentially, it is a messages-actions map.
+
+>If _[actions]_ is omitted or `undefined`, the created **<worker\>** will have no registered actions, so you'll have to use the method `register` before you can use the **<worker\>**.
+<br>If you plan to reuse a **<worker\>**, you should use this method. It creates a reusable **<worker\>** (not a real Web Worker, more on this ahead) with determined actions to be runned through its `postMessage()` or `postAll()` methods.
 
 E.g.:
 ```javascript
 const actions = [
-  { message: 'func1', func: () => 'Working on func1' },
-  { message: 'func2', func: () => 'Working on func2' },
-  { message: 'func3', func: () => 'Working on func3' }
+  { message: 'func1', func: () => `Worker 1: Working on func1` },
+  { message: 'func2', func: arg => `Worker 2: ${arg}` },
+  { message: 'func3', func: arg => `Worker 3: ${arg}` },
+  { message: 'func4', func: (arg = 'Working on func4') => `Worker 4: ${arg}` }
 ]
 
 let worker = this.$worker.create(actions)
 ```
-If you plan to reuse a worker, you should use the `create` method.
 
-It creates a reusable worker (not a real Web Worker, more on this ahead) with determined actions to be runned through its `postMessage()` or `postAll()` methods.
-
-### <worker\>.postMessage(_message_)
+### <worker\>.postMessage(_message, [args]?_)
 
 > Where:
-<br>* <worker\> is a worker created with `this.$worker.create([actions])`
-<br>* _message_ is one of the messages in _[actions]_
+>* **<worker\>** is a worker created with `this.$worker.create([actions])`
+>* _message_ is one of the messages in _[actions]_
+>* _[args]_ is an optional array of arguments that will be used by the function registered with _message_
+
+>When the function does not expect any arguments or the expected arguments have default values, _[args]_ can be omitted safely.
+<br>When the expected arguments do not have default values, _[args]_ should be provided.
+<br>This method works like Promise.resolve(), but in another thread.
 
 E.g.:
 ```javascript
 const actions = [
-  { message: 'func1', func: () => 'Working on func1' },
-  { message: 'func2', func: () => 'Working on func2' },
-  { message: 'func3', func: () => 'Working on func3' }
+  { message: 'func1', func: () => `Worker 1: Working on func1` },
+  { message: 'func2', func: arg => `Worker 2: ${arg}` },
+  { message: 'func3', func: arg => `Worker 3: ${arg}` },
+  { message: 'func4', func: (arg = 'Working on func4') => `Worker 4: ${arg}` }
 ]
 
 let worker = this.$worker.create(actions)
 
-// postMessage() works like Promise.resolve(), but in another thread
 worker.postMessage('func1')
-  .then(console.log) // logs 'Working on func1'
+  .then(console.log) // logs 'Worker 1: Working on func1'
+  .catch(console.error) // logs any possible error
+
+worker.postMessage('func1', ['Ignored', 'arguments'])
+  .then(console.log) // logs 'Worker 1: Working on func1'
   .catch(console.error) // logs any possible error
 
 worker.postMessage('func2')
-  .then(console.log) // logs 'Working on func2'
+  .then(console.log) // logs 'Worker 2: undefined'
   .catch(console.error) // logs any possible error
 
-worker.postMessage('func3')
-  .then(console.log) // logs 'Working on func3'
+worker.postMessage('func3', ['Working on func3'])
+  .then(console.log) // logs 'Worker 3: Working on func3'
+  .catch(console.error) // logs any possible error
+
+worker.postMessage('func4')
+  .then(console.log) // logs 'Worker 4: Working on func4'
+  .catch(console.error) // logs any possible error
+
+worker.postMessage('func4', ['Overwrited argument'])
+  .then(console.log) // logs 'Worker 4: Overwrited argument'
   .catch(console.error) // logs any possible error
 ```
-### <worker\>.postAll(_[messages]?_)
+
+### <worker\>.postAll(_[message1,... || {message: message1, args: [args1]},... || [args1],...]?_)
 
 > Where:
-<br>* **<worker\>** is a worker created with `this.$worker.create([actions])`
-<br>* _[messages]_ is an optional array containing one or more of the messages in _[actions]_
-<br><br>If _[messages]_ is omitted or `undefined`, **<worker\>** will run all registered actions.
+>* **<worker\>** is a worker created with `this.$worker.create([actions])`
+>* The argument is an optional array which accepts one of the following:
+>    * _message1,..._ - strings containing one or more of the messages in _[actions]_
+>   * _{message: message1, args: [args1]},..._ - objects containing two fields, `message` (a message from _actions_) and `args` (the arguments to be used by the correspondent function)
+>    * _[args1],..._ - arrays of arguments to be used by the registered actions.
+
+>If _[message1,...]_ is `undefined` or no argument is given, **<worker\>** will run all registered actions without arguments.
+<br>If _[{message: message1, args: [args1]},...]_ or _[[args1],...]_ is used, you should use `null` as _[args]_ for the functions that does not expect arguments.
+<br>If _[{message: message1, args: [args1]},...]_ is used, every object must contain the fields `message` and `args`.
+<br>This method works like Promise.all(), but in another thread.
 
 E.g.:
 ```javascript
 const actions = [
-  { message: 'func1', func: () => 'Working on func1' },
-  { message: 'func2', func: () => 'Working on func2' },
-  { message: 'func3', func: () => 'Working on func3' },
-  { message: 'func4', func: () => 'Working on func4' }
+  { message: 'func1', func: () => `Worker 1: Working on func1` },
+  { message: 'func2', func: arg => `Worker 2: ${arg}` },
+  { message: 'func3', func: arg => `Worker 3: ${arg}` },
+  { message: 'func4', func: (arg = 'Working on func4') => `Worker 4: ${arg}` }
 ]
 
 let worker = this.$worker.create(actions)
 
-// postAll() works like Promise.all(), but in another thread
-
-// With argument
-worker.postAll(['func1', 'func3'])
-  .then(console.log) // logs ['Working on func1', 'Working on func3']
+worker.postAll()
+  .then(console.log) // logs ['Worker 1: Working on func1', 'Worker 2: undefined', 'Worker 3: undefined', 'Worker 4: Working on func4']
   .catch(console.error) // logs any possible error
 
-// Without argument
-worker.postAll()
-  .then(console.log) // logs ['Working on func1', 'Working on func2', 'Working on func3', 'Working on func4']
+worker.postAll(['func1', 'func3'])
+  .then(console.log) // logs ['Worker 1: Working on func1', 'Worker 3: undefined']
+  .catch(console.error) // logs any possible error
+
+worker.postAll([{ message: 'func1', args: null }, { message: 'func3', args: ['Working on func3'] })
+  .then(console.log) // logs ['Worker 1: Working on func1', 'Worker 3: Working on func3']
+  .catch(console.error) // logs any possible error
+
+worker.postAll([[null], ['Working on func2'], ['Working on func3'], [null]])
+  .then(console.log) // logs ['Worker 1: Working on func1', 'Worker 2: Working on func2', 'Worker 3: Working on func3', 'Worker 4: Working on func4']
+  .catch(console.error) // logs any possible error
+
+worker.postAll([[null], ['func2'], ['func3'], ['Overwriting default value of arg on func4']])
+  .then(console.log) // logs ['Worker 1: Working on func1', 'Worker 2: func2', 'Worker 3: func3', 'Worker 4: Overwriting default value of arg on func4']
   .catch(console.error) // logs any possible error
 ```
 
 ### <worker\>.register(_action_ || _[actions]_)
 
 > Where:
-<br>* **<worker\>** is a worker created with `this.$worker.create([actions])`
-<br>* _action_ is an object with two fields, `message` and `func`
-<br>* _[actions]_ is an array of objects, and each object is an _action_, as defined above
-<br><br>You can use _action_ or _[actions]_, but not both at the same time.
+>* **<worker\>** is a worker created with `this.$worker.create([actions])`
+>* _action_ is an object with two fields, `message` and `func`
+>* _[actions]_ is an array of objects, and each object is an _action_, as defined above
+
+>You can use _action_ or _[actions]_, but not both at the same time.
 
 E.g.:
 
@@ -183,10 +225,11 @@ worker.postAll()
 ### <worker\>.unregister(_message_ || _[messages]_)
 
 > Where:
-<br>* **<worker\>** is a worker created with `this.$worker.create([actions])`
-<br>* _message_ is one of the messages in _[actions]_
-<br>* _[messages]_ is an array containing one or more messages, and each message is a _message_, as defined above
-<br><br>You can use _message_ or _[messages]_, but not both at the same time.
+>* **<worker\>** is a worker created with `this.$worker.create([actions])`
+>* _message_ is one of the messages in _[actions]_
+>* _[messages]_ is an array containing one or more messages, and each message is a _message_, as defined above
+
+>You can use _message_ or _[messages]_, but not both at the same time.
 
 E.g.:
 
