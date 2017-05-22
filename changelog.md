@@ -1,5 +1,9 @@
 # Changelog
 
+## **1.2.0**
+
+* ES5 compliance (Thanks @EmilMoe)
+
 ## **1.1.0**
 
 * API update (as per [simple-web-worker](https://github.com/israelss/simple-web-worker)).

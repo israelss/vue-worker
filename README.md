@@ -4,12 +4,12 @@
 
 ## Changelog
 
-### **1.1.0**
+### **1.2.0**
 
 #### _Highlights:_
-* API update (as per [simple-web-worker](https://github.com/israelss/simple-web-worker)).
+* ES5 compliance (Thanks @EmilMoe)
 
-See full changelog [here](https://github.com/israelss/vue-worker/blob/master/changelog.md).
+See full changelog [here](https://github.com/israelss/vue-worker/blob/master/changelog.md#120).
 
 
 ## Why
