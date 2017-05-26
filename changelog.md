@@ -1,8 +1,12 @@
 # Changelog
 
+## **1.2.1**
+
+* Fix README examples
+
 ## **1.2.0**
 
-* ES5 compliance (Thanks @EmilMoe)
+* ES5 compliance (Thanks [@EmilMoe](https://github.com/EmilMoe))
 
 ## **1.1.0**
 
