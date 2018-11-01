@@ -1,4 +1,4 @@
-import _Vue, { WatchOptions } from "vue";
 import './vue';
+import { WWorker } from './worker'
 
-export declare function install(Vue: typeof _Vue): void;
+export default WWorker;
