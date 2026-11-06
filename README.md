@@ -2,6 +2,9 @@
 
 > A Vue.js plugin to use webworkers in a simply way.
 
+---
+## ⚠️ This project is no longer maintained. For new projects, please consider current alternatives such as [Comlink](https://github.com/googlechromelabs/comlink)
+
 ## Changelog
 
 ### **1.2.1**
